@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H Protocol | 质押与Boost经济模型</title>
+    
+    <!-- 字体和图标 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js 用于数据可视化 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.3.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.0"></script>
+    
+    <style>
+        /* 基础样式 */
+        :root {
+            --primary: #2962ff;
+            --primary-dark: #0039cb;
+            --primary-light: #768fff;
+            --secondary: #00b8d4;
+            --success: #00c853;
+            --warning: #ffab00;
+            --danger: #ff1744;
+            --dark: #0d1b2a;
+            --darker: #070f17;
+            --light: #e0e1dd;
+            --gray: #8d99ae;
+            --card-bg: rgba(19, 33, 48, 0.9);
+            --card-border: rgba(41, 98, 255, 0.2);
+            --glass-bg: rgba(13, 27, 42, 0.7);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(13, 27, 42, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--card-border);
+            padding: 1rem 2rem;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-link {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-light);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            padding-top: 80px;
+        }
+        
+        /* 英雄区域 */
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            background: radial-gradient(circle at center, rgba(41, 98, 255, 0.1) 0%, transparent 70%);
+            border-radius: 1rem;
+            margin-bottom: 3rem;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(41, 98, 255, 0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(41, 98, 255, 0.1);
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        /* 指标卡片 */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .metric-card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-change {
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 0.2rem 0.8rem;
+            border-radius: 50px;
+            align-self: flex-start;
+        }
+        
+        .positive {
+            background: rgba(0, 200, 83, 0.1);
+            color: var(--success);
+        }
+        
+        .negative {
+            background: rgba(255, 23, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        /* 滑块样式 */
+        .slider-container {
+            margin-bottom: 1.5rem;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .slider-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: rgba(41, 98, 255, 0.2);
+            border-radius: 4px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 3px solid var(--dark);
+        }
+        
+        /* 图表容器 */
+        .chart-container {
+            height: 300px;
+            margin-top: 1.5rem;
+        }
+        
+        /* 数据表格 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .data-table th {
+            text-align: left;
+            padding: 1rem;
+            background: rgba(41, 98, 255, 0.1);
+            border-bottom: 1px solid var(--card-border);
+            color: var(--gray);
+            font-weight: 600;
+        }
+        
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .data-table tr:hover {
+            background: rgba(41, 98, 255, 0.05);
+        }
+        
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+            border-top: 1px solid var(--card-border);
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--dark);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+        
+        /* 代码块样式 */
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--primary);
+        }
+        
+        code {
+            font-family: 'Courier New', monospace;
+            color: var(--primary-light);
+        }
+        
+        /* 分割线 */
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--primary), transparent);
+            margin: 3rem 0;
+        }
+        
+        /* 警告框 */
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .alert-info {
+            background: rgba(0, 184, 212, 0.1);
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .alert-warning {
+            background: rgba(255, 171, 0, 0.1);
+            border-left: 4px solid var(--warning);
+        }
+        
+        /* 标签样式 */
+        .tag {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tag-primary {
+            background: rgba(41, 98, 255, 0.1);
+            color: var(--primary);
+        }
+        
+        .tag-success {
+            background: rgba(0, 200, 83, 0.1);
+            color: var(--success);
+        }
+        
+        /* 选项卡 */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--card-border);
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            padding: 0.8rem 1.5rem;
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">H Protocol</a>
+            <div class="nav-links" id="navLinks">
+                <a href="#simulator" class="nav-link">经济模拟器</a>
+                <a href="#model" class="nav-link">经济模型</a>
+                <a href="#data" class="nav-link">数据看板</a>
+                <a href="#faq" class="nav-link">常见问题</a>
+                <a href="#deploy" class="nav-link">部署指南</a>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <div class="container">
+        <!-- 英雄区域 -->
+        <section class="hero">
+            <h1>H Protocol 经济模型</h1>
+            <p>基于X Layer构建的下一代质押与流动性协议，集成OKX Boost，实现可持续的飞轮经济</p>
+            <div class="cta-buttons">
+                <a href="#simulator" class="btn btn-primary">
+                    <i class="fas fa-play-circle"></i> 开始模拟
+                </a>
+                <a href="#model" class="btn btn-secondary">
+                    <i class="fas fa-book"></i> 查看文档
+                </a>
+            </div>
+        </section>
+
+        <!-- 经济模拟器 -->
+        <section id="simulator" class="card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <h2 class="card-title">动态经济模拟器</h2>
+            </div>
+            
+            <p>调整参数，实时观察经济模型变化。所有数据基于智能合约逻辑计算。</p>
+            
+            <!-- 参数控制 -->
+            <div class="card" style="margin-top: 1.5rem;">
+                <h3 style="margin-bottom: 1.5rem;">参数控制面板</h3>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>初始质押总量 (USDT)</span>
+                        <span class="slider-value" id="stakeAmountValue">200,000</span>
+                    </div>
+                    <input type="range" id="stakeAmount" min="50000" max="1000000" value="200000" step="50000">
+                    <small>控制协议初始锁仓价值，影响整体收益率和稳定性</small>
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>每日新增用户</span>
+                        <span class="slider-value" id="newUsersValue">25 用户/日</span>
+                    </div>
+                    <input type="range" id="newUsers" min="5" max="100" value="25" step="5">
+                    <small>模拟用户增长曲线，影响交易量和协议收入</small>
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>平均质押天数</span>
+                        <span class="slider-value" id="avgStakeDaysValue">45 天</span>
+                    </div>
+                    <input type="range" id="avgStakeDays" min="7" max="180" value="45" step="7">
+                    <small>用户平均质押时长，长期质押提升协议稳定性</small>
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>OKX Boost活动强度</span>
+                        <span class="slider-value" id="boostMultiplierValue">1.2x</span>
+                    </div>
+                    <input type="range" id="boostMultiplier" min="0.5" max="3" value="1.2" step="0.1">
+                    <small>Boost活动激励强度，直接影响用户交易量</small>
+                </div>
+                
+                <div class="cta-buttons" style="margin-top: 2rem;">
+                    <button id="startSimulation" class="btn btn-primary">
+                        <i class="fas fa-play"></i> 开始30天模拟
+                    </button>
+                    <button id="triggerBoost" class="btn btn-secondary">
+                        <i class="fas fa-bolt"></i> 触发Boost活动
+                    </button>
+                    <button id="resetSimulation" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i> 重置模拟
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 实时指标 -->
+            <div class="metrics-grid" style="margin-top: 2rem;">
+                <div class="metric-card">
+                    <div class="metric-label">
+                        <i class="fas fa-coins"></i>
+                        H代币价格
+                    </div>
+                    <div class="metric-value" id="priceValue">$0.0100</div>
+                    <div class="metric-change positive" id="priceChange">+0.00%</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">
+                        <i class="fas fa-lock"></i>
+                        总质押价值
+                    </div>
+                    <div class="metric-value" id="tvlValue">$200,000</div>
+                    <div class="metric-change positive" id="tvlChange">+0.0%</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">
+                        <i class="fas fa-chart-line"></i>
+                        24H交易量
+                    </div>
+                    <div class="metric-value" id="volumeValue">$85,000</div>
+                    <div class="metric-change positive" id="volumeChange">+0.0%</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        用户平均日收益
+                    </div>
+                    <div class="metric-value" id="userDailyEarnValue">$12.50</div>
+                    <div class="metric-change positive">基于500U质押</div>
+                </div>
+            </div>
+            
+            <!-- 图表区域 -->
+            <div class="card" style="margin-top: 1.5rem;">
+                <h3 style="margin-bottom: 1.5rem;">经济数据趋势</h3>
+                <div class="tabs">
+                    <button class="tab active" data-tab="price-tab">价格趋势</button>
+                    <button class="tab" data-tab="revenue-tab">收益分配</button>
+                    <button class="tab" data-tab="user-tab">用户增长</button>
+                </div>
+                
+                <div class="tab-content active" id="price-tab">
+                    <div class="chart-container">
+                        <canvas id="priceChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="revenue-tab">
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="user-tab">
+                    <div class="chart-container">
+                        <canvas id="userChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 数据看板 -->
+        <section id="data" class="card" style="margin-top: 2rem;">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h2 class="card-title">透明数据看板</h2>
+            </div>
+            
+            <p>实时展示用户收益、平台收支、税费分配和空投预估等关键数据</p>
+            
+            <div class="metrics-grid" style="margin-top: 1.5rem;">
+                <div class="metric-card">
+                    <div class="metric-label">
+                        <i class="fas fa-user-check"></i>
+                        活跃质押用户
+                    </div>
+                    <div class="metric-value" id="activeUsersValue">625</div>
+                    <div class="metric-change positive" id="usersChange">+2.5%</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">
+                        <i class="fas fa-gift"></i>
+                        用户总收益(日)
+                    </div>
+                    <div class="metric-value" id="totalUserEarningsValue">$7,812</div>
+                    <div class="metric-change positive">质押利息</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">
+                        <i class="fas fa-landmark"></i>
+                        协议收入(日)
+                    </div>
+                    <div class="metric-value" id="protocolRevenueValue">$4,250</div>
+                    <div class="metric-change positive">来自交易税</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">
+                        <i class="fas fa-money-bill-wave"></i>
+                        协议支出(日)
+                    </div>
+                    <div class="metric-value" id="protocolExpenseValue">$7,812</div>
+                    <div class="metric-change negative">质押收益支出</div>
+                </div>
+            </div>
+            
+            <!-- 详细数据表格 -->
+            <div class="card" style="margin-top: 1.5rem;">
+                <h3 style="margin-bottom: 1.5rem;">收益分配详情 (24小时)</h3>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>项目</th>
+                            <th>金额</th>
+                            <th>占比</th>
+                            <th>说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><i class="fas fa-user" style="color: var(--primary); margin-right: 0.5rem;"></i> 用户质押收益</td>
+                            <td id="userEarningDetail">$7,812</td>
+                            <td>65.1%</td>
+                            <td>每日发放给质押用户</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-fire" style="color: var(--danger); margin-right: 0.5rem;"></i> 回购销毁</td>
+                            <td id="buybackDetail">$1,700</td>
+                            <td>14.2%</td>
+                            <td>自动回购H代币并销毁</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-bolt" style="color: var(--warning); margin-right: 0.5rem;"></i> Boost奖池</td>
+                            <td id="boostPoolDetail">$850</td>
+                            <td>7.1%</td>
+                            <td>用于OKX Boost活动奖励</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-tools" style="color: var(--gray); margin-right: 0.5rem;"></i> 运营资金</td>
+                            <td id="operationsDetail">$850</td>
+                            <td>7.1%</td>
+                            <td>协议开发与运营</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-water" style="color: var(--secondary); margin-right: 0.5rem;"></i> 流动性注入</td>
+                            <td id="liquidityDetail">$850</td>
+                            <td>7.1%</td>
+                            <td>增加DEX流动性深度</td>
+                        </tr>
+                        <tr style="font-weight: 600; background: rgba(41, 98, 255, 0.05);">
+                            <td><i class="fas fa-calculator" style="color: var(--success); margin-right: 0.5rem;"></i> 协议净盈余</td>
+                            <td id="netSurplusDetail">-$3,562</td>
+                            <td>-29.7%</td>
+                            <td>收入 - 支出 (启动期正常)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="alert alert-info" style="margin-top: 1.5rem;">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>启动期说明：</strong>协议初期支出大于收入是正常现象，随着用户增长和交易量上升，协议将逐步实现盈亏平衡并产生盈余。当前净盈余为负值是因为高APY吸引早期用户。
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 空投预估 -->
+            <div class="card" style="margin-top: 1.5rem;">
+                <h3 style="margin-bottom: 1.5rem;">OKX Boost空投奖励预估</h3>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">
+                            <i class="fas fa-rocket"></i>
+                            用户总交易量
+                        </div>
+                        <div class="metric-value" id="totalBoostVolumeValue">$425,000</div>
+                        <div class="metric-change positive" id="boostVolumeChange">符合资格</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-label">
+                            <i class="fas fa-award"></i>
+                            预估空投奖励池
+                        </div>
+                        <div class="metric-value" id="boostPoolValue">$25,000</div>
+                        <div class="metric-change positive">等值新币</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-label">
+                            <i class="fas fa-users"></i>
+                            达标用户数
+                        </div>
+                        <div class="metric-value" id="qualifiedUsersValue">425</div>
+                        <div class="metric-change positive">68%用户达标</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-label">
+                            <i class="fas fa-gift"></i>
+                            用户平均空投
+                        </div>
+                        <div class="metric-value" id="avgUserAirdropValue">$58.82</div>
+                        <div class="metric-change positive">基于当前交易量</div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning" style="margin-top: 1.5rem;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>注意：</strong>空投奖励为预估数值，实际奖励取决于OKX Boost活动规则、参与用户总数以及新币项目方提供的奖池大小。用户需完成最低交易量要求（如10天内$500）才有资格参与。
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 经济模型文档 -->
+        <section id="model" class="card" style="margin-top: 2rem;">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h2 class="card-title">H Protocol 经济模型文档</h2>
+            </div>
+            
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    本文档详细说明H Protocol的经济模型设计，包括代币经济、质押规则、OKX Boost集成和可持续性机制。
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem;">1. 代币经济</h3>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">
+                        <i class="fas fa-coins"></i>
+                        代币总量
+                    </div>
+                    <div class="metric-value">10亿 H</div>
+                    <div class="metric-change positive">固定发行</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">
+                        <i class="fas fa-network-wired"></i>
+                        所在链
+                    </div>
+                    <div class="metric-value">X Layer</div>
+                    <div class="metric-change positive">OKB Chain</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">
+                        <i class="fas fa-percentage"></i>
+                        交易税费
+                    </div>
+                    <div class="metric-value">买卖各5%</div>
+                    <div class="metric-change positive">总计10%</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">
+                        <i class="fas fa-box-open"></i>
+                        初始流通
+                    </div>
+                    <div class="metric-value">2.5亿 H</div>
+                    <div class="metric-change positive">25%总量</div>
+                </div>
+            </div>
+            
+            <h4 style="margin-top: 1.5rem; margin-bottom: 1rem;">代币分配</h4>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>用途</th>
+                        <th>比例</th>
+                        <th>数量</th>
+                        <th>释放规则</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>质押挖矿</td>
+                        <td>45%</td>
+                        <td>4.5亿 H</td>
+                        <td>根据质押动态产出</td>
+                    </tr>
+                    <tr>
+                        <td>流动性池</td>
+                        <td>20%</td>
+                        <td>2.0亿 H</td>
+                        <td>初始提供+LP奖励</td>
+                    </tr>
+                    <tr>
+                        <td>团队与开发</td>
+                        <td>15%</td>
+                        <td>1.5亿 H</td>
+                        <td>6个月锁仓，24个月线性释放</td>
+                    </tr>
+                    <tr>
+                        <td>生态基金</td>
+                        <td>10%</td>
+                        <td>1.0亿 H</td>
+                        <td>DAO治理决定释放</td>
+                    </tr>
+                    <tr>
+                        <td>市场推广</td>
+                        <td>5%</td>
+                        <td>0.5亿 H</td>
+                        <td>按季度释放</td>
+                    </tr>
+                    <tr>
+                        <td>社区空投</td>
+                        <td>5%</td>
+                        <td>0.5亿 H</td>
+                        <td>分3批释放</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem;">2. 质押规则</h3>
+            <p>用户质押USDT获得H代币收益，无锁仓，随时赎回，每日20点发放等值U的H代币。</p>
+            
+            <h4 style="margin-top: 1.5rem; margin-bottom: 1rem;">质押收益规则（动态调整）</h4>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>质押阶段</th>
+                        <th>天数</th>
+                        <th>日利率</th>
+                        <th>年化APY</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>第一阶段</td>
+                        <td>1-7天</td>
+                        <td>0.5%</td>
+                        <td>182.5%</td>
+                    </tr>
+                    <tr>
+                        <td>第二阶段</td>
+                        <td>8-15天</td>
+                        <td>0.6%</td>
+                        <td>219.0%</td>
+                    </tr>
+                    <tr>
+                        <td>第三阶段</td>
+                        <td>16-30天</td>
+                        <td>0.8%</td>
+                        <td>292.0%</td>
+                    </tr>
+                    <tr>
+                        <td>第四阶段</td>
+                        <td>31-60天</td>
+                        <td>1.0%</td>
+                        <td>365.0%</td>
+                    </tr>
+                    <tr>
+                        <td>第五阶段</td>
+                        <td>61天以上</td>
+                        <td>1.2%</td>
+                        <td>438.0%</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="alert alert-info" style="margin-top: 1.5rem;">
+                <i class="fas fa-lightbulb"></i>
+                <div>
+                    <strong>收益发放机制：</strong>每日发放的H代币数量根据当前币价动态调整。协议设定每日发放等值于固定USDT金额的H代币，因此币价越高，发放的H代币数量越少，但等值USDT价值不变。
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem;">3. OKX Boost集成</h3>
+            <p>H Protocol与OKX Boost深度集成，用户通过交易H代币获得Boost交易量，从而有资格参与新币空投。</p>
+            
+            <div class="metrics-grid" style="margin-top: 1.5rem;">
+                <div class="metric-card">
+                    <div class="metric-label">
+                        <i class="fas fa-exchange-alt"></i>
+                        交易对系数
+                    </div>
+                    <div class="metric-value">0.85x</div>
+                    <div class="metric-change positive">H/USDT交易</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">
+                        <i class="fas fa-chart-bar"></i>
+                        榜单加成
+                    </div>
+                    <div class="metric-value">最高50%</div>
+                    <div class="metric-change positive">额外交易量</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">
+                        <i class="fas fa-tachometer-alt"></i>
+                        最低要求
+                    </div>
+                    <div class="metric-value">$500/10天</div>
+                    <div class="metric-change positive">基础门槛</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">
+                        <i class="fas fa-medal"></i>
+                        资格规则
+                    </div>
+                    <div class="metric-value">交易量排名</div>
+                    <div class="metric-change positive">按比例分配</div>
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem;">4. 税费分配机制</h3>
+            <p>买卖各5%的交易税按以下比例自动分配：</p>
+            
+            <div class="chart-container" style="height: 250px; margin-top: 1rem;">
+                <canvas id="taxDistributionChart"></canvas>
+            </div>
+        </section>
+
+        <!-- 常见问题 -->
+        <section id="faq" class="card" style="margin-top: 2rem;">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <h2 class="card-title">常见问题解答</h2>
+            </div>
+            
+            <div style="margin-top: 1.5rem;">
+                <h3 style="margin-bottom: 1rem;">Q1: 币价上涨时，我收到的H代币数量会减少吗？</h3>
+                <p><strong>答：</strong>是的，但您的收益价值不变。协议每日发放等值于固定USDT金额的H代币。例如，如果每日发放总额等值10,000 USDT：</p>
+                <ul style="margin-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 1rem;">
+                    <li>当H币价=$0.01时，发放1,000,000个H</li>
+                    <li>当H币价=$0.02时，发放500,000个H</li>
+                </ul>
+                <p>您质押的USDT会按比例分得其中的H代币，虽然数量变化，但等值USDT价值是稳定的。</p>
+                
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Q2: 如何参与OKX Boost获得新币空投？</h3>
+                <p><strong>答：</strong>您需要：</p>
+                <ol style="margin-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 1rem;">
+                    <li>质押USDT获得H代币</li>
+                    <li>将H代币提取到OKX Web3钱包</li>
+                    <li>在OKX DEX交易H代币（建议H/USDT交易对）</li>
+                    <li>在10天内累计至少$500的有效Boost交易量</li>
+                    <li>在活动页面手动领取空投奖励</li>
+                </ol>
+                
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Q3: 协议如何保证可持续性？</h3>
+                <p><strong>答：</strong>通过多重机制：</p>
+                <ul style="margin-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 1rem;">
+                    <li><strong>交易税费收入：</strong>买卖各5%的税提供持续收入</li>
+                    <li><strong>动态利率调整：</strong>根据TVL和交易量自动调整收益率</li>
+                    <li><strong>自动回购销毁：</strong>40%的税费用于回购销毁H代币，创造通缩压力</li>
+                    <li><strong>飞轮效应：</strong>更多用户→更多交易→更多税费→更多回购→币价支撑</li>
+                </ul>
+                
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Q4: 用户收益主要来自哪里？</h3>
+                <p><strong>答：</strong>用户可获得双重收益：</p>
+                <ol style="margin-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 1rem;">
+                    <li><strong>质押收益：</strong>每日领取H代币，年化APY根据质押时长在182.5%-438%之间</li>
+                    <li><strong>空投收益：</strong>通过OKX Boost交易获得新币空投，根据交易量按比例分配</li>
+                </ol>
+                
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Q5: 协议的收入和支出如何？</h3>
+                <p><strong>答：</strong>在模拟器中可实时查看：</p>
+                <ul style="margin-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 1rem;">
+                    <li><strong>收入：</strong>主要来自10%交易税（买卖各5%）</li>
+                    <li><strong>支出：</strong>主要是每日质押收益发放</li>
+                    <li><strong>净盈余：</strong>初期可能为负（高APY吸引用户），随着交易量增长将转为正</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 部署指南 -->
+        <section id="deploy" class="card" style="margin-top: 2rem;">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fab fa-github"></i>
+                </div>
+                <h2 class="card-title">GitHub部署指南</h2>
+            </div>
+            
+            <p style="margin-top: 1rem;">将此单文件官网部署到GitHub Pages，让用户在线访问完整的经济模拟器。</p>
+            
+            <div class="alert alert-info" style="margin-top: 1.5rem;">
+                <i class="fas fa-laptop-code"></i>
+                <div>
+                    <strong>提示：</strong>此HTML文件包含所有必需的代码、样式和脚本，无需额外文件即可运行。
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem;">部署步骤</h3>
+            
+            <div style="margin-left: 1rem;">
+                <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">步骤1：保存HTML文件</h4>
+                <p>将此文件保存为 <code>index.html</code>。</p>
+                
+                <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">步骤2：创建GitHub仓库</h4>
+                <p>访问 <a href="https://github.com" target="_blank" style="color: var(--primary);">GitHub</a> 并创建新仓库，命名为如 <code>h-protocol-simulator</code>。</p>
+                
+                <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">步骤3：上传文件</h4>
+                <p>将 <code>index.html</code> 上传至仓库根目录。</p>
+                
+                <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">步骤4：启用GitHub Pages</h4>
+                <p>进入仓库设置 → Pages → Source，选择 <code>main</code> 分支，根目录 <code>/ (root)</code>，点击保存。</p>
+                
+                <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">步骤5：访问您的官网</h4>
+                <p>稍等片刻，您的官网将在以下地址上线：<br>
+                <code>https://[您的用户名].github.io/h-protocol-simulator/</code></p>
+            </div>
+            
+            <div class="alert alert-warning" style="margin-top: 1.5rem;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>自定义提示：</strong>您可以根据需要修改此HTML文件中的任何内容，包括项目名称、参数、颜色方案等，然后重新上传到GitHub。
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem;">高级功能扩展</h3>
+            <p>如果您希望扩展此模拟器的功能，可以考虑：</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 1rem;">
+                <li>添加多语言支持</li>
+                <li>集成真实链上数据API</li>
+                <li>添加用户登录和投资组合跟踪</li>
+                <li>创建移动端应用版本</li>
+                <li>添加更多图表和数据分析工具</li>
+            </ul>
+        </section>
+        
+        <div class="section-divider"></div>
+        
+        <!-- 页脚 -->
+        <footer class="footer">
+            <p>H Protocol 经济模型模拟器 | 单文件官网 | 基于X Layer链与OKX Boost集成</p>
+            <p style="margin-top: 1rem; font-size: 0.8rem;">
+                此模拟器仅供演示和教育目的。实际数据可能因市场条件、协议参数调整和智能合约实现而异。
+            </p>
+            <p style="margin-top: 0.5rem; font-size: 0.8rem;">
+                © 2023 H Protocol. 所有数据均为模拟生成。
+            </p>
+        </footer>
+    </div>
+
+    <!-- JavaScript代码 -->
+    <script>
+        // 初始化变量
+        let simulationInterval;
+        let currentDay = 0;
+        const maxDays = 30;
+        let isSimulating = false;
+        
+        // 经济模型参数
+        const model = {
+            // 基础参数
+            totalSupply: 1000000000,
+            currentPrice: 0.01,
+            stakedUSDT: 200000,
+            circulatingSupply: 250000000,
+            
+            // 动态参数
+            dailyVolume: 85000,
+            activeUsers: 625,
+            boostParticipants: 425,
+            taxCollected: 4250,
+            
+            // 用户参数
+            dailyNewUsers: 25,
+            avgStakeDays: 45,
+            boostMultiplier: 1.2,
+            marketSentiment: 0.75,
+            
+            // 分配参数
+            taxAllocation: {
+                buyback: 40,
+                boostPool: 20,
+                operations: 20,
+                liquidity: 20
+            },
+            
+            // 历史数据
+            history: {
+                prices: [0.01],
+                volumes: [85000],
+                staked: [200000],
+                users: [625],
+                revenues: [4250],
+                userEarnings: [7812],
+                days: [0]
+            }
+        };
+        
+        // 图表实例
+        let priceChart, revenueChart, userChart, taxChart;
+        
+        // DOM加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initEventListeners();
+            initCharts();
+            updateAllDisplays();
+        });
+        
+        // 初始化事件监听器
+        function initEventListeners() {
+            // 导航菜单
+            document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+                document.getElementById('navLinks').classList.toggle('active');
+            });
+            
+            // 选项卡
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // 移除所有活动的选项卡和内容
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // 激活当前选项卡和内容
+                    this.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // 滑块控制
+            document.getElementById('stakeAmount').addEventListener('input', function() {
+                model.stakedUSDT = parseInt(this.value);
+                document.getElementById('stakeAmountValue').textContent = 
+                    model.stakedUSDT.toLocaleString();
+                updateAllDisplays();
+            });
+            
+            document.getElementById('newUsers').addEventListener('input', function() {
+                model.dailyNewUsers = parseInt(this.value);
+                document.getElementById('newUsersValue').textContent = 
+                    model.dailyNewUsers + ' 用户/日';
+                updateAllDisplays();
+            });
+            
+            document.getElementById('avgStakeDays').addEventListener('input', function() {
+                model.avgStakeDays = parseInt(this.value);
+                document.getElementById('avgStakeDaysValue').textContent = 
+                    model.avgStakeDays + ' 天';
+                updateAllDisplays();
+            });
+            
+            document.getElementById('boostMultiplier').addEventListener('input', function() {
+                model.boostMultiplier = parseFloat(this.value);
+                document.getElementById('boostMultiplierValue').textContent = 
+                    model.boostMultiplier.toFixed(1) + 'x';
+                updateAllDisplays();
+            });
+            
+            // 按钮控制
+            document.getElementById('startSimulation').addEventListener('click', function() {
+                if (!isSimulating) {
+                    startSimulation();
+                } else {
+                    stopSimulation();
+                }
+            });
+            
+            document.getElementById('triggerBoost').addEventListener('click', triggerBoostEvent);
+            document.getElementById('resetSimulation').addEventListener('click', resetSimulation);
+            
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                        
+                        // 移动端关闭菜单
+                        document.getElementById('navLinks').classList.remove('active');
+                    }
+                });
+            });
+        }
+        
+        // 初始化图表
+        function initCharts() {
+            // 价格图表
+            const priceCtx = document.getElementById('priceChart').getContext('2d');
+            priceChart = new Chart(priceCtx, {
+                type: 'line',
+                data: {
+                    labels: model.history.days.map(d => 'Day ' + d),
+                    datasets: [{
+                        label: 'H代币价格 (USDT)',
+                        data: model.history.prices,
+                        borderColor: '#2962ff',
+                        backgroundColor: 'rgba(41, 98, 255, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e0e1dd'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(224, 225, 221, 0.1)'
+                            },
+                            ticks: {
+                                color: '#8d99ae'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(224, 225, 221, 0.1)'
+                            },
+                            ticks: {
+                                color: '#8d99ae',
+                                callback: function(value) {
+                                    return '$' + value.toFixed(4);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 收益分配图表
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            revenueChart = new Chart(revenueCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['用户收益', '回购销毁', 'Boost奖池', '运营资金', '流动性'],
+                    datasets: [{
+                        label: 'USDT金额',
+                        data: [7812, 1700, 850, 850, 850],
+                        backgroundColor: [
+                            '#00c853',
+                            '#ff1744',
+                            '#ffab00',
+                            '#8d99ae',
+                            '#00b8d4'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#8d99ae'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(224, 225, 221, 0.1)'
+                            },
+                            ticks: {
+                                color: '#8d99ae',
+                                callback: function(value) {
+                                    return '$' + (value/1000).toFixed(0) + 'K';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 用户增长图表
+            const userCtx = document.getElementById('userChart').getContext('2d');
+            userChart = new Chart(userCtx, {
+                type: 'line',
+                data: {
+                    labels: model.history.days.map(d => 'Day ' + d),
+                    datasets: [
+                        {
+                            label: '活跃用户',
+                            data: model.history.users,
+                            borderColor: '#00b8d4',
+                            backgroundColor: 'rgba(0, 184, 212, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Boost参与者',
+                            data: model.history.users.map(u => Math.floor(u * 0.68)),
+                            borderColor: '#ffab00',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e0e1dd'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(224, 225, 221, 0.1)'
+                            },
+                            ticks: {
+                                color: '#8d99ae'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(224, 225, 221, 0.1)'
+                            },
+                            ticks: {
+                                color: '#8d99ae'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 税费分配图表
+            const taxCtx = document.getElementById('taxDistributionChart').getContext('2d');
+            taxChart = new Chart(taxCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['回购销毁', 'Boost奖池', '运营资金', '流动性'],
+                    datasets: [{
+                        data: [40, 20, 20, 20],
+                        backgroundColor: [
+                            '#ff1744',
+                            '#ffab00',
+                            '#8d99ae',
+                            '#00b8d4'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#e0e1dd',
+                                padding: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 更新所有显示
+        function updateAllDisplays() {
+            updateMainMetrics();
+            updateDataDashboard();
+            updateDetailedTables();
+            updateCharts();
+        }
+        
+        // 更新主要指标
+        function updateMainMetrics() {
+            // 计算市值
+            const marketCap = model.currentPrice * model.circulatingSupply;
+            
+            // 价格指标
+            document.getElementById('priceValue').textContent = 
+                '$' + model.currentPrice.toFixed(4);
+            
+            // 计算价格变化
+            if (model.history.prices.length > 1) {
+                const prevPrice = model.history.prices[model.history.prices.length - 2];
+                const priceChange = ((model.currentPrice - prevPrice) / prevPrice * 100).toFixed(2);
+                const changeElement = document.getElementById('priceChange');
+                changeElement.textContent = (priceChange >= 0 ? '+' : '') + priceChange + '%';
+                changeElement.className = 'metric-change ' + (priceChange >= 0 ? 'positive' : 'negative');
+            }
+            
+            // TVL指标
+            document.getElementById('tvlValue').textContent = 
+                '$' + model.stakedUSDT.toLocaleString();
+            
+            // 交易量指标
+            document.getElementById('volumeValue').textContent = 
+                '$' + model.dailyVolume.toLocaleString();
+            
+            // 用户日收益（基于500U质押计算）
+            const dailyRate = calculateDailyRate(model.avgStakeDays);
+            const userDailyEarn = 500 * dailyRate;
+            document.getElementById('userDailyEarnValue').textContent = 
+                '$' + userDailyEarn.toFixed(2);
+        }
+        
+        // 更新数据看板
+        function updateDataDashboard() {
+            // 活跃用户
+            document.getElementById('activeUsersValue').textContent = 
+                model.activeUsers.toLocaleString();
+            
+            // 用户总收益（日）
+            const dailyRate = calculateDailyRate(model.avgStakeDays);
+            const totalUserEarnings = model.stakedUSDT * dailyRate;
+            document.getElementById('totalUserEarningsValue').textContent = 
+                '$' + Math.round(totalUserEarnings).toLocaleString();
+            
+            // 协议收入（日）- 来自交易税
+            const protocolRevenue = model.dailyVolume * 0.05; // 5%买卖税
+            document.getElementById('protocolRevenueValue').textContent = 
+                '$' + Math.round(protocolRevenue).toLocaleString();
+            
+            // 协议支出（日）- 质押收益支出
+            document.getElementById('protocolExpenseValue').textContent = 
+                '$' + Math.round(totalUserEarnings).toLocaleString();
+            
+            // Boost相关数据
+            document.getElementById('totalBoostVolumeValue').textContent = 
+                '$' + model.dailyVolume.toLocaleString();
+            
+            // Boost奖池（基于协议收入计算）
+            const boostPool = protocolRevenue * (model.taxAllocation.boostPool / 100);
+            document.getElementById('boostPoolValue').textContent = 
+                '$' + Math.round(boostPool).toLocaleString();
+            
+            // 达标用户数（假设68%用户达标）
+            const qualifiedUsers = Math.floor(model.activeUsers * 0.68);
+            document.getElementById('qualifiedUsersValue').textContent = 
+                qualifiedUsers.toLocaleString();
+            
+            // 用户平均空投
+            const avgUserAirdrop = boostPool / qualifiedUsers;
+            document.getElementById('avgUserAirdropValue').textContent = 
+                '$' + avgUserAirdrop.toFixed(2);
+        }
+        
+        // 更新详细表格
+        function updateDetailedTables() {
+            const dailyRate = calculateDailyRate(model.avgStakeDays);
+            const totalUserEarnings = model.stakedUSDT * dailyRate;
+            const protocolRevenue = model.dailyVolume * 0.05;
+            
+            // 用户收益
+            document.getElementById('userEarningDetail').textContent = 
+                '$' + Math.round(totalUserEarnings).toLocaleString();
+            
+            // 回购销毁
+            const buyback = protocolRevenue * (model.taxAllocation.buyback / 100);
+            document.getElementById('buybackDetail').textContent = 
+                '$' + Math.round(buyback).toLocaleString();
+            
+            // Boost奖池
+            const boostPool = protocolRevenue * (model.taxAllocation.boostPool / 100);
+            document.getElementById('boostPoolDetail').textContent = 
+                '$' + Math.round(boostPool).toLocaleString();
+            
+            // 运营资金
+            const operations = protocolRevenue * (model.taxAllocation.operations / 100);
+            document.getElementById('operationsDetail').textContent = 
+                '$' + Math.round(operations).toLocaleString();
+            
+            // 流动性
+            const liquidity = protocolRevenue * (model.taxAllocation.liquidity / 100);
+            document.getElementById('liquidityDetail').textContent = 
+                '$' + Math.round(liquidity).toLocaleString();
+            
+            // 协议净盈余
+            const netSurplus = protocolRevenue - totalUserEarnings;
+            document.getElementById('netSurplusDetail').textContent = 
+                '$' + Math.round(netSurplus).toLocaleString();
+            
+            // 更新表格中的百分比
+            const total = protocolRevenue + Math.abs(netSurplus);
+            document.querySelectorAll('.data-table tr td:nth-child(3)').forEach((td, index) => {
+                let percent = 0;
+                switch(index) {
+                    case 0: percent = (totalUserEarnings / total * 100).toFixed(1); break;
+                    case 1: percent = (buyback / total * 100).toFixed(1); break;
+                    case 2: percent = (boostPool / total * 100).toFixed(1); break;
+                    case 3: percent = (operations / total * 100).toFixed(1); break;
+                    case 4: percent = (liquidity / total * 100).toFixed(1); break;
+                    case 5: percent = (netSurplus / total * 100).toFixed(1); break;
+                }
+                td.textContent = percent + '%';
+            });
+        }
+        
+        // 更新图表
+        function updateCharts() {
+            // 价格图表
+            priceChart.data.labels = model.history.days.map(d => 'Day ' + d);
+            priceChart.data.datasets[0].data = model.history.prices;
+            priceChart.update();
+            
+            // 收益分配图表
+            const dailyRate = calculateDailyRate(model.avgStakeDays);
+            const totalUserEarnings = model.stakedUSDT * dailyRate;
+            const protocolRevenue = model.dailyVolume * 0.05;
+            const buyback = protocolRevenue * (model.taxAllocation.buyback / 100);
+            const boostPool = protocolRevenue * (model.taxAllocation.boostPool / 100);
+            const operations = protocolRevenue * (model.taxAllocation.operations / 100);
+            const liquidity = protocolRevenue * (model.taxAllocation.liquidity / 100);
+            
+            revenueChart.data.datasets[0].data = [
+                totalUserEarnings, buyback, boostPool, operations, liquidity
+            ];
+            revenueChart.update();
+            
+            // 用户增长图表
+            userChart.data.labels = model.history.days.map(d => 'Day ' + d);
+            userChart.data.datasets[0].data = model.history.users;
+            userChart.data.datasets[1].data = model.history.users.map(u => Math.floor(u * 0.68));
+            userChart.update();
+        }
+        
+        // 计算日利率
+        function calculateDailyRate(stakeDays) {
+            if (stakeDays <= 7) return 0.005;
+            if (stakeDays <= 15) return 0.006;
+            if (stakeDays <= 30) return 0.008;
+            if (stakeDays <= 60) return 0.01;
+            return 0.012;
+        }
+        
+        // 开始模拟
+        function startSimulation() {
+            if (isSimulating) return;
+            
+            isSimulating = true;
+            currentDay = 0;
+            
+            document.getElementById('startSimulation').innerHTML = 
+                '<i class="fas fa-pause"></i> 暂停模拟';
+            
+            simulationInterval = setInterval(function() {
+                simulateDay();
+                currentDay++;
+                
+                if (currentDay >= maxDays) {
+                    stopSimulation();
+                    alert('30天模拟完成！您可以查看完整的经济数据趋势。');
+                }
+            }, 1000); // 每1秒模拟一天
+        }
+        
+        // 停止模拟
+        function stopSimulation() {
+            if (!isSimulating) return;
+            
+            clearInterval(simulationInterval);
+            isSimulating = false;
+            
+            document.getElementById('startSimulation').innerHTML = 
+                '<i class="fas fa-play"></i> 开始30天模拟';
+        }
+        
+        // 模拟一天的经济运行
+        function simulateDay() {
+            // 1. 新用户质押
+            const newStakeAmount = model.dailyNewUsers * (800 + Math.random() * 400); // 800-1200U/人
+            model.stakedUSDT += newStakeAmount;
+            
+            // 2. 用户增长
+            model.activeUsers += Math.floor(model.dailyNewUsers * 0.7);
+            
+            // 3. 价格动态
+            const baseVolatility = 0.015;
+            const demandPressure = Math.log(model.dailyVolume / 50000) * 0.008;
+            const randomFactor = (Math.random() - 0.5) * baseVolatility;
+            const boostEffect = (model.boostMultiplier - 1) * 0.003;
+            
+            let priceChange = demandPressure + randomFactor + boostEffect;
+            model.currentPrice *= (1 + priceChange);
+            
+            // 价格边界
+            model.currentPrice = Math.max(0.005, Math.min(0.05, model.currentPrice));
+            
+            // 4. 交易量生成
+            const baseVolume = 50000;
+            const stakeVolume = model.stakedUSDT / 10;
+            const randomVolume = 0.7 + Math.random() * 0.6;
+            
+            model.dailyVolume = Math.round(
+                (baseVolume + stakeVolume) * randomVolume * model.boostMultiplier
+            );
+            
+            // 5. 保存历史数据
+            model.history.prices.push(model.currentPrice);
+            model.history.volumes.push(model.dailyVolume);
+            model.history.staked.push(model.stakedUSDT);
+            model.history.users.push(model.activeUsers);
+            model.history.revenues.push(model.dailyVolume * 0.05);
+            
+            const dailyRate = calculateDailyRate(model.avgStakeDays);
+            model.history.userEarnings.push(model.stakedUSDT * dailyRate);
+            model.history.days.push(model.history.days.length);
+            
+            // 保持历史数据长度
+            if (model.history.prices.length > 30) {
+                model.history.prices.shift();
+                model.history.volumes.shift();
+                model.history.staked.shift();
+                model.history.users.shift();
+                model.history.revenues.shift();
+                model.history.userEarnings.shift();
+                model.history.days.shift();
+            }
+            
+            // 6. 更新显示
+            updateAllDisplays();
+        }
+        
+        // 触发Boost事件
+        function triggerBoostEvent() {
+            // 提升Boost乘数
+            model.boostMultiplier = Math.min(3, model.boostMultiplier * 1.5);
+            document.getElementById('boostMultiplier').value = model.boostMultiplier;
+            document.getElementById('boostMultiplierValue').textContent = 
+                model.boostMultiplier.toFixed(1) + 'x';
+            
+            // 增加交易量
+            model.dailyVolume *= 2.5;
+            
+            // 增加用户
+            model.activeUsers += 150;
+            
+            // 视觉反馈
+            const boostBtn = document.getElementById('triggerBoost');
+            boostBtn.style.background = 'linear-gradient(to right, #ffab00, #ff6f00)';
+            setTimeout(() => {
+                boostBtn.style.background = '';
+            }, 1000);
+            
+            // 更新显示
+            updateAllDisplays();
+            
+            alert('OKX Boost活动已触发！\n交易量乘数增加至 ' + model.boostMultiplier.toFixed(1) + 'x\n用户交易量大幅提升！');
+        }
+        
+        // 重置模拟
+        function resetSimulation() {
+            stopSimulation();
+            
+            // 重置模型参数
+            model.currentPrice = 0.01;
+            model.stakedUSDT = 200000;
+            model.dailyVolume = 85000;
+            model.activeUsers = 625;
+            model.boostMultiplier = 1.2;
+            
+            // 重置历史数据
+            model.history = {
+                prices: [0.01],
+                volumes: [85000],
+                staked: [200000],
+                users: [625],
+                revenues: [4250],
+                userEarnings: [7812],
+                days: [0]
+            };
+            
+            // 重置滑块
+            document.getElementById('stakeAmount').value = 200000;
+            document.getElementById('newUsers').value = 25;
+            document.getElementById('avgStakeDays').value = 45;
+            document.getElementById('boostMultiplier').value = 1.2;
+            
+            // 更新显示
+            updateAllDisplays();
+            
+            alert('模拟已重置为初始状态！');
+        }
+        
+        // 页面卸载时停止模拟
+        window.addEventListener('beforeunload', function() {
+            if (isSimulating) {
+                stopSimulation();
+            }
+        });
+    </script>
+</body>
+</html>
