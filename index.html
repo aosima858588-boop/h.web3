@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>海豚动态经济模型演示</title>
+    <title>海豚动态经济模型 | 专业经济模型门户</title>
     
     <!-- 字体优化 -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -74,6 +74,7 @@
         
         html {
             font-size: 16px;
+            scroll-behavior: smooth;
         }
         
         body {
@@ -90,18 +91,19 @@
             width: 100%;
             max-width: 480px;
             margin: 0 auto;
-            padding: 0 var(--space-md);
+            padding: var(--space-lg) var(--space-md) 0;
         }
         
-        /* 顶部横幅 */
+        /* 顶部横幅 - 增加上边距 */
         .top-banner {
             background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
             padding: var(--space-xl) var(--space-md);
             text-align: center;
-            border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+            border-radius: var(--radius-xl);
             margin-bottom: var(--space-xl);
             position: relative;
             overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
         
         .top-banner::before {
@@ -129,15 +131,17 @@
             line-height: 1.2;
             position: relative;
             z-index: 1;
+            letter-spacing: -0.5px;
         }
         
         .main-subtitle {
-            font-size: var(--text-lg);
+            font-size: var(--text-base);
             color: rgba(255, 255, 255, 0.9);
             max-width: 400px;
             margin: 0 auto;
             position: relative;
             z-index: 1;
+            line-height: 1.5;
         }
         
         /* 文字入口导航 */
@@ -188,6 +192,7 @@
         .nav-desc {
             font-size: var(--text-sm);
             color: var(--gray);
+            line-height: 1.4;
         }
         
         /* 模型区域 */
@@ -208,6 +213,7 @@
             display: flex;
             align-items: center;
             gap: var(--space-sm);
+            letter-spacing: -0.3px;
         }
         
         .section-title i {
@@ -241,6 +247,7 @@
             font-weight: 600;
             margin-bottom: var(--space-md);
             color: var(--white);
+            letter-spacing: -0.2px;
         }
         
         .chart-wrapper {
@@ -269,6 +276,7 @@
             font-weight: 700;
             color: var(--white);
             margin-bottom: 4px;
+            letter-spacing: -0.3px;
         }
         
         .metric-label {
@@ -276,6 +284,7 @@
             color: var(--gray);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            line-height: 1.3;
         }
         
         /* 控制面板 */
@@ -424,6 +433,12 @@
         
         .text-content.active {
             display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .content-title {
@@ -432,6 +447,7 @@
             font-weight: 700;
             margin-bottom: var(--space-lg);
             color: var(--white);
+            letter-spacing: -0.3px;
         }
         
         .content-section {
@@ -444,6 +460,7 @@
             font-weight: 600;
             margin-bottom: var(--space-md);
             color: var(--white);
+            letter-spacing: -0.2px;
         }
         
         .content-section p {
@@ -452,8 +469,8 @@
             line-height: 1.7;
         }
         
-        .content-section ul {
-            padding-left: var(--space-lg);
+        .content-section ul, .content-section ol {
+            padding-left: var(--space-xl);
             margin-bottom: var(--space-md);
         }
         
@@ -494,15 +511,16 @@
         @media (min-width: 768px) {
             .container {
                 max-width: 768px;
-                padding: 0 var(--space-xl);
+                padding: var(--space-xl) var(--space-xl) 0;
             }
             
             .main-title {
-                font-size: 3rem;
+                font-size: 2.75rem;
             }
             
             .main-subtitle {
-                font-size: var(--text-xl);
+                font-size: var(--text-lg);
+                max-width: 600px;
             }
             
             .chart-wrapper {
@@ -511,6 +529,10 @@
             
             .metrics-grid {
                 grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .text-nav {
+                gap: var(--space-md);
             }
         }
         
@@ -713,6 +735,7 @@
             transition: all 0.3s ease;
             margin-bottom: var(--space-sm);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            line-height: 1.5;
         }
         
         .tooltip-text::after {
@@ -744,6 +767,7 @@
             display: flex;
             align-items: center;
             gap: var(--space-sm);
+            letter-spacing: -0.2px;
         }
         
         /* 新增：海豚动画 */
@@ -757,14 +781,187 @@
             background-size: cover;
             z-index: -1;
         }
+        
+        /* 新增：分隔线 */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            margin: var(--space-xl) 0;
+        }
+        
+        /* 新增：标签样式 */
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(30, 136, 229, 0.1);
+            color: var(--primary);
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            font-weight: 600;
+            margin-right: var(--space-xs);
+            margin-bottom: var(--space-xs);
+        }
+        
+        /* 新增：返回顶部按钮 */
+        .back-to-top {
+            position: fixed;
+            bottom: 24px;
+            right: 16px;
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 999;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .back-to-top:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        /* 新增：模型评估卡片 */
+        .evaluation-card {
+            background: linear-gradient(135deg, rgba(30, 136, 229, 0.15), rgba(0, 172, 193, 0.15));
+            border: 1px solid rgba(30, 136, 229, 0.3);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin: var(--space-xl) 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .evaluation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        .evaluation-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .evaluation-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: -0.3px;
+        }
+        
+        .evaluation-score {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-light);
+        }
+        
+        .evaluation-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+        
+        .evaluation-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            border: var(--border);
+        }
+        
+        .evaluation-item-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: var(--text-base);
+            font-weight: 600;
+            color: var(--light);
+            margin-bottom: var(--space-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .evaluation-item-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: var(--white);
+        }
+        
+        .evaluation-item-label {
+            font-size: var(--text-xs);
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+        
+        /* 新增：价格机制选择器 */
+        .price-mechanism-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            margin-top: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .mechanism-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: var(--border);
+            border-radius: var(--radius-md);
+            color: var(--gray-light);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .mechanism-btn:hover {
+            background: rgba(30, 136, 229, 0.1);
+            color: var(--light);
+        }
+        
+        .mechanism-btn.active {
+            background: rgba(30, 136, 229, 0.2);
+            color: var(--primary-light);
+            border-color: var(--primary);
+        }
     </style>
 </head>
 <body>
+    <!-- 返回顶部按钮 -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-chevron-up"></i>
+    </div>
+    
     <div class="container">
         <!-- 顶部横幅 -->
         <section class="top-banner">
             <h1 class="main-title">海豚动态经济模型</h1>
-            <p class="main-subtitle">来源真实收益，基于X Layer的下一代质押经济协议，创新性社区协同策略，集成OKX Boost，实现可持续收益飞轮</p>
+            <p class="main-subtitle">
+                基于X Layer的下一代质押经济协议，创新性社区协同策略，集成OKX Boost，实现可持续收益飞轮
+            </p>
             <div class="dolphin-wave"></div>
         </section>
 
@@ -838,12 +1035,32 @@
                 <i class="fas fa-chart-line"></i> 经济模型可视化
             </h2>
             
+            <!-- 价格机制选择器 -->
+            <div class="price-mechanism-selector">
+                <div class="mechanism-btn active" data-mechanism="tvl">
+                    <i class="fas fa-chart-line"></i> TVL驱动模型
+                </div>
+                <div class="mechanism-btn" data-mechanism="market">
+                    <i class="fas fa-balance-scale"></i> 市场供需模型
+                </div>
+                <div class="mechanism-btn" data-mechanism="hybrid">
+                    <i class="fas fa-sync-alt"></i> 混合动力模型
+                </div>
+                <div class="mechanism-btn" data-mechanism="growth">
+                    <i class="fas fa-rocket"></i> 成长飞轮模型
+                </div>
+            </div>
+            
             <!-- 多图表展示 -->
             <div class="charts-grid">
                 <div class="chart-container">
                     <h3 class="chart-title">H代币价格趋势</h3>
                     <div class="chart-wrapper">
                         <canvas id="priceChart"></canvas>
+                    </div>
+                    <div class="metric-card mt-sm">
+                        <div class="metric-value" id="priceChange">+12.5%</div>
+                        <div class="metric-label">24小时涨跌幅</div>
                     </div>
                 </div>
                 
@@ -923,12 +1140,24 @@
                 <input type="range" id="dailyTradeVolume" min="1000" max="50000" value="10000" step="1000">
             </div>
             
+            <!-- 价格机制强度 -->
+            <div class="slider-group">
+                <div class="slider-header">
+                    <span class="slider-label">价格机制强度</span>
+                    <span class="slider-value" id="mechanismStrength">中</span>
+                </div>
+                <input type="range" id="priceMechanismStrength" min="1" max="10" value="5" step="1">
+            </div>
+            
             <!-- 按钮 -->
             <button id="calculateBtn" class="btn btn-primary">
                 <i class="fas fa-calculator"></i> 计算我的收益
             </button>
             <button id="simulateBtn" class="btn btn-secondary">
                 <i class="fas fa-play"></i> 运行30天模拟
+            </button>
+            <button id="resetBtn" class="btn btn-secondary mt-sm">
+                <i class="fas fa-redo"></i> 重置模拟
             </button>
         </section>
 
@@ -979,6 +1208,74 @@
             </div>
         </section>
 
+        <!-- 新增：模型评估结果 -->
+        <section class="model-section" id="evaluationSection" style="display: none;">
+            <h2 class="section-title">
+                <i class="fas fa-star"></i> 模型模拟评估
+            </h2>
+            
+            <div class="evaluation-card">
+                <div class="evaluation-header">
+                    <div class="evaluation-title">30天模拟结果评估</div>
+                    <div class="evaluation-score" id="totalScore">86.5</div>
+                </div>
+                
+                <p style="color: var(--gray-light); line-height: 1.6; margin-bottom: var(--space-lg);">
+                    根据30天模拟结果，海豚动态经济模型表现优异。价格增长机制有效，资本利得显著，协议健康度保持在良好水平。
+                </p>
+                
+                <div class="evaluation-grid">
+                    <div class="evaluation-item">
+                        <div class="evaluation-item-title">
+                            <i class="fas fa-chart-line" style="color: var(--success);"></i>
+                            价格增长表现
+                        </div>
+                        <div class="evaluation-item-value" id="priceGrowthScore">92%</div>
+                        <div class="evaluation-item-label">价格涨幅评分</div>
+                    </div>
+                    
+                    <div class="evaluation-item">
+                        <div class="evaluation-item-title">
+                            <i class="fas fa-shield-alt" style="color: var(--primary);"></i>
+                            协议稳定性
+                        </div>
+                        <div class="evaluation-item-value" id="stabilityScore">88%</div>
+                        <div class="evaluation-item-label">风险控制评分</div>
+                    </div>
+                    
+                    <div class="evaluation-item">
+                        <div class="evaluation-item-title">
+                            <i class="fas fa-users" style="color: var(--secondary);"></i>
+                            用户增长潜力
+                        </div>
+                        <div class="evaluation-item-value" id="userGrowthScore">85%</div>
+                        <div class="evaluation-item-label">社区发展评分</div>
+                    </div>
+                    
+                    <div class="evaluation-item">
+                        <div class="evaluation-item-title">
+                            <i class="fas fa-coins" style="color: var(--accent);"></i>
+                            收益可持续性
+                        </div>
+                        <div class="evaluation-item-value" id="sustainabilityScore">81%</div>
+                        <div class="evaluation-item-label">长期收益评分</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: var(--space-lg); padding: var(--space-md); background: rgba(255, 255, 255, 0.03); border-radius: var(--radius-md);">
+                    <h4 style="font-family: 'Poppins', sans-serif; color: var(--primary-light); margin-bottom: var(--space-sm);">
+                        <i class="fas fa-chart-bar"></i> 综合评估报告
+                    </h4>
+                    <p style="color: var(--gray-light); font-size: var(--text-sm); line-height: 1.6; margin-bottom: var(--space-sm);" id="evaluationReport">
+                        模型表现优秀，价格增长机制有效，TVL与价格正相关关系明显。建议继续优化回购销毁机制，增强价格稳定性。
+                    </p>
+                    <div class="status-indicator status-healthy mt-sm">
+                        综合评价：优秀
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- 新增：协议健康度仪表盘 -->
         <section class="model-section">
             <h2 class="section-title">
@@ -1026,49 +1323,6 @@
                 <div class="metric-card" style="background: rgba(255, 152, 0, 0.1); border-color: rgba(255, 152, 0, 0.2);">
                     <div class="metric-value" id="pegDeviation">-2.1%</div>
                     <div class="metric-label">价格锚定偏差</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 新增：多维度数据分析 -->
-        <section class="model-section">
-            <h2 class="section-title">
-                <i class="fas fa-chart-bar"></i> 多维度数据分析
-            </h2>
-            
-            <div class="charts-grid">
-                <div class="chart-container">
-                    <h3 class="chart-title">用户行为分析</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="userBehaviorChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="chart-container">
-                    <h3 class="chart-title">收益来源分布</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="revenueSourceChart"></canvas>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 高级指标 -->
-            <div class="metrics-grid mt-lg">
-                <div class="metric-card">
-                    <div class="metric-value" id="sharpeRatio">3.2</div>
-                    <div class="metric-label">夏普比率</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value" id="sortinoRatio">4.1</div>
-                    <div class="metric-label">索提诺比率</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value" id="maxDrawdown">-12.5%</div>
-                    <div class="metric-label">最大回撤</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value" id="recoveryTime">7天</div>
-                    <div class="metric-label">平均恢复时间</div>
                 </div>
             </div>
         </section>
@@ -1296,12 +1550,12 @@
                 <a href="#"><i class="fab fa-github"></i></a>
                 <a href="#"><i class="fab fa-medium"></i></a>
             </div>
-            <p>海豚动态经济模型 | OKX策略模型验证</p>
+            <p>海豚动态经济模型 | 专业经济模型门户</p>
             <p class="mt-sm" style="color: var(--gray); font-size: var(--text-xs);">
                 本模拟器基于公开数据和合理假设构建，不构成投资建议。实际收益受市场条件影响。DeFi投资有风险，请谨慎参与。
             </p>
             <p class="mt-sm" style="color: var(--gray); font-size: var(--text-xs);">
-                © 2026 海豚动态经济模型. 保留所有权利。
+                © 2023 海豚动态经济模型. 保留所有权利。
             </p>
         </footer>
     </div>
@@ -1312,6 +1566,20 @@
         let isSimulating = false;
         let currentDay = 0;
         let capitalGainData = []; // 存储资本利得数据
+        let priceHistory = []; // 价格历史数据
+        let initialStakeAmount = 0; // 初始质押金额
+        let simulationResults = {}; // 模拟结果数据
+        
+        // 价格机制类型
+        const PRICE_MECHANISMS = {
+            TVL: 'tvl',           // TVL驱动模型：质押总量决定价格
+            MARKET: 'market',     // 市场供需模型：供需关系决定价格
+            HYBRID: 'hybrid',     // 混合动力模型：TVL+交易量+回购销毁
+            GROWTH: 'growth'      // 成长飞轮模型：用户增长+飞轮效应
+        };
+        
+        // 当前选中的价格机制
+        let currentPriceMechanism = PRICE_MECHANISMS.TVL;
         
         // 扩展经济模型数据 - 专业级数据维度
         const model = {
@@ -1319,6 +1587,7 @@
             stakeAmount: 1000,
             stakeDays: 45,
             dailyTradeVolume: 10000,
+            priceMechanismStrength: 5, // 1-10
             
             // 公平发射相关数据
             fairLaunch: {
@@ -1406,15 +1675,6 @@
                 bidAskSpread: 0.8, // 点差百分比
                 marketSentiment: 72, // 0-100
                 competitorAPY: [245, 280, 195, 310] // 竞争对手APY
-            },
-            
-            // 图表历史数据
-            history: {
-                prices: [],
-                volumes: [],
-                stakingTVL: [],
-                activeUsers: [],
-                capitalGains: [] // 资本利得历史数据
             }
         };
         
@@ -1429,6 +1689,7 @@
             initEventListeners();
             calculateEarnings();
             updateAllMetrics();
+            initScrollToTop();
             
             // 自动更新数据（模拟实时数据）
             setInterval(updateAllMetrics, 5000);
@@ -1438,9 +1699,6 @@
         function initializeHistoricalData() {
             // 生成30天历史数据，模拟公平发射后的价格增长
             let basePrice = 0.001; // 从公平发射初始价格开始
-            let baseVolume = 50000;
-            let baseTVL = 150000;
-            let baseUsers = 500;
             
             for (let i = 0; i < 30; i++) {
                 // 价格序列 - 模拟公平发射后的快速增长
@@ -1450,36 +1708,11 @@
                 const priceNoise = (Math.random() - 0.5) * 0.001;
                 const price = basePrice * (1 + priceGrowth + priceAcceleration + priceSeasonal + priceNoise);
                 
-                // 交易量序列
-                const volumeTrend = i * 1000;
-                const volumeSeasonal = Math.sin(i / 3.5) * 15000;
-                const volumeNoise = (Math.random() - 0.5) * 8000;
-                const volume = Math.max(10000, baseVolume + volumeTrend + volumeSeasonal + volumeNoise);
-                
-                // TVL序列
-                const tvlTrend = i * 3000;
-                const tvlSeasonal = Math.sin(i / 5) * 10000;
-                const tvlNoise = (Math.random() - 0.5) * 5000;
-                const tvl = Math.max(50000, baseTVL + tvlTrend + tvlSeasonal + tvlNoise);
-                
-                // 用户序列
-                const userTrend = i * 5;
-                const userSeasonal = Math.sin(i / 4) * 15;
-                const userNoise = (Math.random() - 0.5) * 10;
-                const users = Math.max(300, baseUsers + userTrend + userSeasonal + userNoise);
-                
-                // 资本利得序列 - 基于价格增长计算
-                const capitalGain = price / basePrice * 1000 - 1000; // 简化计算
-                
-                model.history.prices.push(price);
-                model.history.volumes.push(volume);
-                model.history.stakingTVL.push(tvl);
-                model.history.activeUsers.push(users);
-                model.history.capitalGains.push(capitalGain);
+                priceHistory.push(price);
             }
             
             // 更新当前价格为最新
-            model.fairLaunch.currentPrice = model.history.prices[model.history.prices.length - 1];
+            model.fairLaunch.currentPrice = priceHistory[priceHistory.length - 1];
         }
         
         // 初始化图表
@@ -1493,7 +1726,7 @@
                     datasets: [
                         {
                             label: 'H价格',
-                            data: model.history.prices,
+                            data: priceHistory,
                             borderColor: '#1E88E5',
                             backgroundColor: 'rgba(30, 136, 229, 0.1)',
                             borderWidth: 3,
@@ -1720,7 +1953,7 @@
                         ticks: {
                             color: '#607D8B',
                             callback: function(value) {
-                                return isLine ? '$' + value.toFixed(3) : value + '%';
+                                return isLine ? '$' + value.toFixed(4) : value + '%';
                             },
                             font: { family: 'Inter', size: 10 }
                         }
@@ -1773,18 +2006,24 @@
             };
         }
         
-        // 计算移动平均线
-        function calculateMovingAverage(data, period) {
-            const result = [];
-            for (let i = 0; i < data.length; i++) {
-                if (i < period - 1) {
-                    result.push(null);
+        // 初始化返回顶部按钮
+        function initScrollToTop() {
+            const backToTopBtn = document.getElementById('backToTop');
+            
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTopBtn.classList.add('visible');
                 } else {
-                    const sum = data.slice(i - period + 1, i + 1).reduce((a, b) => a + b, 0);
-                    result.push(sum / period);
+                    backToTopBtn.classList.remove('visible');
                 }
-            }
-            return result;
+            });
+            
+            backToTopBtn.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
         }
         
         // 事件监听器
@@ -1810,6 +2049,27 @@
                 });
             });
             
+            // 价格机制选择器
+            document.querySelectorAll('.mechanism-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // 移除所有按钮的active类
+                    document.querySelectorAll('.mechanism-btn').forEach(b => {
+                        b.classList.remove('active');
+                    });
+                    
+                    // 为当前按钮添加active类
+                    this.classList.add('active');
+                    
+                    // 更新当前价格机制
+                    currentPriceMechanism = this.dataset.mechanism;
+                    
+                    // 根据机制更新价格计算
+                    updatePriceBasedOnMechanism();
+                    
+                    showToast(`已切换到${this.textContent.trim()}`, 'info');
+                });
+            });
+            
             // 控制面板事件
             document.getElementById('stakeAmount').addEventListener('input', function() {
                 model.stakeAmount = parseFloat(this.value) || 1000;
@@ -1828,6 +2088,14 @@
                 calculateEarnings();
             });
             
+            document.getElementById('priceMechanismStrength').addEventListener('input', function() {
+                model.priceMechanismStrength = parseInt(this.value);
+                const strengthText = model.priceMechanismStrength <= 3 ? '弱' : 
+                                   model.priceMechanismStrength <= 7 ? '中' : '强';
+                document.getElementById('mechanismStrength').textContent = strengthText;
+                calculateEarnings();
+            });
+            
             document.getElementById('calculateBtn').addEventListener('click', function() {
                 calculateEarnings();
                 showToast('收益计算完成！', 'success');
@@ -1841,6 +2109,10 @@
                 }
             });
             
+            document.getElementById('resetBtn').addEventListener('click', function() {
+                resetSimulation();
+            });
+            
             // 点击其他地方关闭文字内容
             document.addEventListener('click', function(event) {
                 if (!event.target.closest('.nav-card') && !event.target.closest('.text-content')) {
@@ -1849,6 +2121,84 @@
                     });
                 }
             });
+        }
+        
+        // 根据选择的机制更新价格
+        function updatePriceBasedOnMechanism() {
+            const mechanismStrength = model.priceMechanismStrength / 10; // 转换为0.1-1.0的系数
+            
+            switch(currentPriceMechanism) {
+                case PRICE_MECHANISMS.TVL:
+                    // TVL驱动模型：质押总额每增加10%，价格增长1% * 强度系数
+                    const tvlGrowth = (model.staking.totalStaked - 200000) / 200000; // 相对于初始20万的增长率
+                    const tvlEffect = 1 + (tvlGrowth * 0.1 * mechanismStrength);
+                    model.fairLaunch.currentPrice = model.fairLaunch.initialPrice * tvlEffect;
+                    break;
+                    
+                case PRICE_MECHANISMS.MARKET:
+                    // 市场供需模型：交易量增加推动价格上涨
+                    const volumeEffect = 1 + (model.dailyTradeVolume / 100000 * 0.05 * mechanismStrength);
+                    const marketNoise = (Math.random() - 0.5) * 0.02 * mechanismStrength;
+                    model.fairLaunch.currentPrice = model.fairLaunch.initialPrice * volumeEffect * (1 + marketNoise);
+                    break;
+                    
+                case PRICE_MECHANISMS.HYBRID:
+                    // 混合动力模型：TVL+交易量+回购销毁
+                    const tvlEffectHybrid = 1 + ((model.staking.totalStaked - 200000) / 200000 * 0.08 * mechanismStrength);
+                    const volumeEffectHybrid = 1 + (model.dailyTradeVolume / 100000 * 0.04 * mechanismStrength);
+                    const burnEffect = 1 + (model.revenue.cumulativeBurn / 10000000 * 0.02 * mechanismStrength);
+                    model.fairLaunch.currentPrice = model.fairLaunch.initialPrice * tvlEffectHybrid * volumeEffectHybrid * burnEffect;
+                    break;
+                    
+                case PRICE_MECHANISMS.GROWTH:
+                    // 成长飞轮模型：用户增长+飞轮效应
+                    const userGrowthEffect = 1 + (model.staking.activeUsers / 1000 * 0.03 * mechanismStrength);
+                    const networkEffect = 1 + (Math.pow(model.staking.activeUsers / 1000, 1.5) * 0.01 * mechanismStrength);
+                    const timeEffect = 1 + (currentDay / 100 * 0.05 * mechanismStrength);
+                    model.fairLaunch.currentPrice = model.fairLaunch.initialPrice * userGrowthEffect * networkEffect * timeEffect;
+                    break;
+            }
+            
+            // 确保价格不会低于初始价格
+            model.fairLaunch.currentPrice = Math.max(model.fairLaunch.initialPrice, model.fairLaunch.currentPrice);
+            
+            // 更新价格历史
+            updatePriceHistory();
+        }
+        
+        // 更新价格历史数据
+        function updatePriceHistory() {
+            // 添加新价格到历史数据
+            priceHistory.push(model.fairLaunch.currentPrice);
+            
+            // 如果历史数据超过30天，移除最旧的数据
+            if (priceHistory.length > 30) {
+                priceHistory.shift();
+            }
+            
+            // 更新图表
+            if (priceChart) {
+                priceChart.data.datasets[0].data = priceHistory;
+                priceChart.update('none');
+            }
+            
+            // 计算24小时涨跌幅
+            if (priceHistory.length >= 2) {
+                const currentPrice = priceHistory[priceHistory.length - 1];
+                const previousPrice = priceHistory[priceHistory.length - 2];
+                const priceChangePercent = ((currentPrice - previousPrice) / previousPrice * 100).toFixed(2);
+                
+                document.getElementById('priceChange').textContent = 
+                    (priceChangePercent >= 0 ? '+' : '') + priceChangePercent + '%';
+                
+                // 根据涨跌幅设置颜色
+                const priceChangeElement = document.getElementById('priceChange');
+                if (priceChangePercent >= 0) {
+                    priceChangeElement.style.color = '#00C853';
+                } else {
+                    priceChangeElement.style.color = '#F44336';
+                }
+            }
         }
         
         // 计算收益（包括资本利得）
@@ -1903,9 +2253,8 @@
         
         // 更新所有指标
         function updateAllMetrics() {
-            // 更新价格（模拟公平发射后的自然增长）
-            const priceChange = (Math.random() - 0.4) * 0.004; // 偏向正增长
-            model.fairLaunch.currentPrice = Math.max(0.001, model.fairLaunch.currentPrice * (1 + priceChange));
+            // 根据选择的机制更新价格
+            updatePriceBasedOnMechanism();
             
             // 更新其他指标
             model.staking.totalStaked += (Math.random() - 0.3) * 5000; // 偏向增长
@@ -1960,16 +2309,6 @@
         
         // 更新图表数据
         function updateChartsData() {
-            // 更新价格历史
-            model.history.prices.shift();
-            model.history.prices.push(model.fairLaunch.currentPrice);
-            
-            // 更新价格图表
-            if (priceChart) {
-                priceChart.data.datasets[0].data = model.history.prices;
-                priceChart.update('none');
-            }
-            
             // 更新健康度雷达图
             if (healthChart) {
                 model.health.healthMetrics = [
@@ -2034,27 +2373,25 @@
             
             isSimulating = true;
             currentDay = 0;
+            initialStakeAmount = model.stakeAmount;
+            
             const btn = document.getElementById('simulateBtn');
             btn.innerHTML = '<i class="fas fa-pause"></i> 停止模拟';
             btn.style.background = 'linear-gradient(135deg, var(--warning), #D97706)';
             
-            const initialPrice = model.fairLaunch.currentPrice;
-            const initialData = [...model.history.prices];
+            // 隐藏评估结果（如果有）
+            document.getElementById('evaluationSection').style.display = 'none';
             
             simulationInterval = setInterval(() => {
                 currentDay++;
                 
-                // 模拟价格变化 - 公平发射后的快速增长
-                const trend = 0.0006; // 强劲的正向趋势
-                const acceleration = Math.min(0.001, currentDay * 0.00002); // 随时间加速
-                const volatility = (Math.random() - 0.3) * 0.008; // 偏向正波动
-                const newPrice = initialPrice * (1 + trend * currentDay + acceleration + volatility);
-                
-                model.fairLaunch.currentPrice = Math.max(0.001, Math.min(0.05, newPrice));
+                // 根据选择的机制模拟价格变化
+                updatePriceBasedOnMechanism();
                 
                 // 更新协议数据
-                model.staking.totalStaked += model.stakeAmount * 0.15;
+                model.staking.totalStaked += initialStakeAmount * 0.15;
                 model.staking.activeUsers += 3;
+                model.revenue.cumulativeBurn += model.revenue.dailyBurn;
                 
                 // 重新计算收益（包括资本利得）
                 calculateEarnings();
@@ -2065,9 +2402,10 @@
                 // 检查是否完成
                 if (currentDay >= 30) {
                     stopSimulation();
-                    showToast('30天经济模拟完成！公平发射带来显著资本利得！', 'success');
+                    evaluateSimulationResults();
+                    showToast('30天经济模拟完成！模型评估结果已生成。', 'success');
                 }
-            }, 600);
+            }, 600); // 每600ms更新一次（约1.6秒模拟一天）
         }
         
         // 停止模拟
@@ -2080,6 +2418,185 @@
             const btn = document.getElementById('simulateBtn');
             btn.innerHTML = '<i class="fas fa-play"></i> 运行30天模拟';
             btn.style.background = '';
+        }
+        
+        // 重置模拟
+        function resetSimulation() {
+            stopSimulation();
+            
+            // 重置变量
+            currentDay = 0;
+            priceHistory = [];
+            capitalGainData = [];
+            
+            // 重置模型数据
+            model.fairLaunch.currentPrice = 0.001;
+            model.staking.totalStaked = 200000;
+            model.staking.activeUsers = 625;
+            model.revenue.cumulativeBurn = 12500000;
+            
+            // 重新初始化历史数据
+            initializeHistoricalData();
+            
+            // 重置图表
+            if (priceChart) {
+                priceChart.data.datasets[0].data = priceHistory;
+                priceChart.update('none');
+            }
+            
+            // 重置评估结果
+            document.getElementById('evaluationSection').style.display = 'none';
+            
+            // 重新计算收益
+            calculateEarnings();
+            
+            showToast('模拟已重置！', 'info');
+        }
+        
+        // 评估模拟结果
+        function evaluateSimulationResults() {
+            // 计算各项评分指标
+            const priceGrowthScore = calculatePriceGrowthScore();
+            const stabilityScore = calculateStabilityScore();
+            const userGrowthScore = calculateUserGrowthScore();
+            const sustainabilityScore = calculateSustainabilityScore();
+            
+            // 计算总分（加权平均）
+            const totalScore = (
+                priceGrowthScore * 0.35 +
+                stabilityScore * 0.30 +
+                userGrowthScore * 0.20 +
+                sustainabilityScore * 0.15
+            ).toFixed(1);
+            
+            // 生成评估报告
+            const evaluationReport = generateEvaluationReport(totalScore, priceGrowthScore, stabilityScore);
+            
+            // 更新评估结果显示
+            document.getElementById('totalScore').textContent = totalScore;
+            document.getElementById('priceGrowthScore').textContent = priceGrowthScore.toFixed(0) + '%';
+            document.getElementById('stabilityScore').textContent = stabilityScore.toFixed(0) + '%';
+            document.getElementById('userGrowthScore').textContent = userGrowthScore.toFixed(0) + '%';
+            document.getElementById('sustainabilityScore').textContent = sustainabilityScore.toFixed(0) + '%';
+            document.getElementById('evaluationReport').textContent = evaluationReport;
+            
+            // 显示评估结果
+            document.getElementById('evaluationSection').style.display = 'block';
+            
+            // 滚动到评估结果
+            document.getElementById('evaluationSection').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+            
+            // 保存模拟结果
+            simulationResults = {
+                totalScore: parseFloat(totalScore),
+                priceGrowthScore,
+                stabilityScore,
+                userGrowthScore,
+                sustainabilityScore,
+                finalPrice: model.fairLaunch.currentPrice,
+                priceGrowth: ((model.fairLaunch.currentPrice - model.fairLaunch.initialPrice) / model.fairLaunch.initialPrice * 100).toFixed(2),
+                tvlGrowth: ((model.staking.totalStaked - 200000) / 200000 * 100).toFixed(2),
+                userGrowth: ((model.staking.activeUsers - 625) / 625 * 100).toFixed(2),
+                mechanismUsed: currentPriceMechanism,
+                mechanismStrength: model.priceMechanismStrength
+            };
+        }
+        
+        // 计算价格增长评分
+        function calculatePriceGrowthScore() {
+            const priceGrowth = (model.fairLaunch.currentPrice - model.fairLaunch.initialPrice) / model.fairLaunch.initialPrice * 100;
+            
+            // 根据价格增长幅度评分
+            if (priceGrowth >= 500) return 95 + Math.random() * 5;
+            if (priceGrowth >= 300) return 85 + Math.random() * 10;
+            if (priceGrowth >= 200) return 75 + Math.random() * 10;
+            if (priceGrowth >= 100) return 65 + Math.random() * 10;
+            if (priceGrowth >= 50) return 55 + Math.random() * 10;
+            return 40 + Math.random() * 15;
+        }
+        
+        // 计算稳定性评分
+        function calculateStabilityScore() {
+            // 计算价格波动率
+            let priceVolatility = 0;
+            if (priceHistory.length > 1) {
+                let sum = 0;
+                for (let i = 1; i < priceHistory.length; i++) {
+                    sum += Math.abs((priceHistory[i] - priceHistory[i-1]) / priceHistory[i-1]);
+                }
+                priceVolatility = (sum / (priceHistory.length - 1)) * 100;
+            }
+            
+            // 根据波动率评分
+            if (priceVolatility < 5) return 90 + Math.random() * 10;
+            if (priceVolatility < 10) return 80 + Math.random() * 10;
+            if (priceVolatility < 15) return 70 + Math.random() * 10;
+            if (priceVolatility < 20) return 60 + Math.random() * 10;
+            return 50 + Math.random() * 10;
+        }
+        
+        // 计算用户增长评分
+        function calculateUserGrowthScore() {
+            const userGrowth = (model.staking.activeUsers - 625) / 625 * 100;
+            
+            // 根据用户增长评分
+            if (userGrowth >= 100) return 90 + Math.random() * 10;
+            if (userGrowth >= 50) return 80 + Math.random() * 10;
+            if (userGrowth >= 25) return 70 + Math.random() * 10;
+            if (userGrowth >= 10) return 60 + Math.random() * 10;
+            return 50 + Math.random() * 10;
+        }
+        
+        // 计算可持续性评分
+        function calculateSustainabilityScore() {
+            // 综合考虑TVL增长、储备金覆盖率、回购销毁等因素
+            const tvlScore = Math.min(100, (model.staking.totalStaked / 500000) * 100);
+            const reserveScore = Math.min(100, model.health.reserveRatio * 50);
+            const burnScore = Math.min(100, (model.revenue.cumulativeBurn / 20000000) * 100);
+            
+            return (tvlScore * 0.4 + reserveScore * 0.3 + burnScore * 0.3) * 0.8 + Math.random() * 20;
+        }
+        
+        // 生成评估报告
+        function generateEvaluationReport(totalScore, priceGrowthScore, stabilityScore) {
+            let report = "";
+            
+            // 根据总分生成总体评价
+            if (totalScore >= 90) {
+                report = "模型表现卓越！价格增长强劲，稳定性优秀，用户增长显著。该模型具有极高的投资价值和可持续发展潜力。";
+            } else if (totalScore >= 80) {
+                report = "模型表现优秀！价格增长机制有效，TVL与价格正相关关系明显。建议继续优化回购销毁机制，增强价格稳定性。";
+            } else if (totalScore >= 70) {
+                report = "模型表现良好！价格增长符合预期，但波动性略高。建议加强风险控制机制，提升协议稳定性。";
+            } else if (totalScore >= 60) {
+                report = "模型表现一般！价格增长有限，用户增长缓慢。建议优化激励机制，吸引更多用户参与。";
+            } else {
+                report = "模型表现有待改进！价格增长乏力，风险较高。建议重新设计经济模型，加强基础建设。";
+            }
+            
+            // 添加机制特定评价
+            const mechanismNames = {
+                'tvl': 'TVL驱动模型',
+                'market': '市场供需模型',
+                'hybrid': '混合动力模型',
+                'growth': '成长飞轮模型'
+            };
+            
+            report += ` 当前使用的${mechanismNames[currentPriceMechanism]}在${model.priceMechanismStrength <= 3 ? '弱' : model.priceMechanismStrength <= 7 ? '中' : '强'}强度下运行。`;
+            
+            // 添加建议
+            if (priceGrowthScore < 70) {
+                report += " 建议提高质押收益率或增强回购销毁力度以刺激价格增长。";
+            }
+            
+            if (stabilityScore < 70) {
+                report += " 建议增加储备金比例或引入价格稳定机制以降低波动性。";
+            }
+            
+            return report;
         }
         
         // 显示提示
